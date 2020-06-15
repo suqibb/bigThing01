@@ -71,7 +71,7 @@
                 //     Authorization:localStorage.getItem('token')
                 // },
                 success: function (bc) {
-                    console.log(bc);
+                    // console.log(bc);
                     $('.user_info span').text(bc.data.nickname)
                     $('.user_info img').attr(bc.data.nickname)
                 }
@@ -80,6 +80,18 @@
                 localStorage.removeItem('token');
                 window.location.href = './login.html'
             })
+            // 排他 点击给谁加类名
+            $('.menu').on('click','.level01',function () {
+                $(this).addClass('active').siblings().removeClass('active');
+                if($(this).index()==1) {
+                    $('.level02').slideToggle();
+                    $('.level02').on('click','li',function () {
+                        $(this).toggleClass('active').siblings().removeClass('active');
+                      });
+                      $(this).find('b').toggleClass('rotate0');
+                      console.log('1')
+                }
+              })
         })
     </script>
 </body>
