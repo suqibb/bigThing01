@@ -14,6 +14,19 @@
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <script id="editList" type="text/html">
+        {{each data v}}
+        <tr>
+            <td>{{v.name}}</td>
+            <td>{{v.slug}}</td>
+            <td class="text-center">
+                <a href="javascript:void(0)" data-target="#myModal" data-toggle="modal"
+                    class=" btn btn-info btn-xs" data-id = {{v.id}}>编辑</a>
+                <a href="javascript:void(0)" class="btn btn-danger btn-xs">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
 </head>
 
 <body>
@@ -51,5 +64,80 @@
             </table>
         </div>
     </div>
+    <!-- 模态框 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">新增</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">分类名称:</label>
+                            <input type="text" class="form-control" id="recipient-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">分类别名:</label>
+                            <textarea class="form-control" id="message-text"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary addOredit">Send message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./libs/http.js"></script>
+    <script>
+        $.ajax({
+            url: BigNew.category_list,
+            type: 'get',
+            success: function (bc) {
+                console.log(bc)
+                $('tbody').html(template('editList', bc))
+
+            }
+
+        })
+        $('#myModal').on('show.bs.modal	', function (e) {
+            console.log($(e.relatedTarget))
+            if ($(e.relatedTarget).text() == '新增分类') {
+                $('.addOredit').text('新增');
+                $('.modal-title').text('新增分类');
+                $('.addOredit').addClass('btn-primary').removeClass('btn-success');
+            } else {
+                $('.addOredit').text('编辑')
+                $('.modal-title').text('编辑分类');
+                $('.addOredit').addClass('btn-success').removeClass('btn-primary');
+            }
+        })
+        // 提交分类
+        $('.addOredit').on('click', function (e) {
+            e.preventDefault();
+            var editName = $('#recipient-name').val();
+            var anotherN = $('#message-text').val();
+            if ($(this).text() == '新增') {
+                $.ajax({
+                    url: BigNew.category_add,
+                    type: 'post',
+                    data: {
+                        name: editName,
+                        slug: anotherN
+                    },
+                    success: function (bc) {
+                        window.location.reload();
+                    }
+                })
+            }
+
+
+        })
+    </script>
+</body>>
 
 </html>
