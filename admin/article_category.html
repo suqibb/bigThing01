@@ -110,6 +110,8 @@
                 $('.addOredit').text('新增');
                 $('.modal-title').text('新增分类');
                 $('.addOredit').addClass('btn-primary').removeClass('btn-success');
+                $('#recipient-name').val('');
+                $('#message-text').val('');
             } else {
                 $('.addOredit').text('编辑')
                 $('.modal-title').text('编辑分类');
@@ -131,7 +133,9 @@
             var editName = $('#recipient-name').val();
             var anotherN = $('#message-text').val();
             var thisId = $(this).attr('data-id');
-            console.log($(this))
+            console.log(thisId)
+            console.log(anotherN)
+            console.log(editName)
             if ($(this).text() == '新增') {
                 $.ajax({
                     url: BigNew.category_add,
