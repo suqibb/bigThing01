@@ -88,7 +88,7 @@
                 if ($(this).index() == 1) {
                     $('.level02').slideToggle();
                     $('.level02').on('click', 'li', function () {
-                        $(this).toggleClass('active').siblings().removeClass('active');
+                        $(this).addClass('active').siblings().removeClass('active');
                     });
                     $(this).find('b').toggleClass('rotate0');
                     $('.level02>li:eq(0)>a')[0].click();
