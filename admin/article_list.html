@@ -29,7 +29,7 @@
             <td class="text-center">{{v.date}}</td>
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
+                <a href="article_edit.html?id={{v.id}}" class="btn btn-default btn-xs">编辑</a>
                 <a href="javascript:void(0);" class="btn btn-danger btn-xs delete" id='{{v.id}}'>删除</a>
             </td>
         </tr>
@@ -84,7 +84,7 @@
                         <td class="text-center">2017-06-08 07:08:46</td>
                         <td class="text-center">已发布</td>
                         <td class="text-center">
-                            <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
+                            <a href="article_edit.html" + class="btn btn-default btn-xs">编辑</a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
                         </td>
                     </tr>
@@ -129,11 +129,14 @@
                             callback(bc);
                         } else if (bc.data.data == 0 && mypage - 1 == bc.data.totalPage) {
                             mypage -= 1;
-                            $('#pagination').twbsPagination('changeTotalPages',
-                                bc.data.totalPage, mypage)
-                        } else if (bc.data.data == 0) {
                             $('#pagination').siblings().show();
                             $('#pagination').hide();
+
+
+                        } else if (bc.data.data == 0) {
+
+                            $('#pagination').twbsPagination('changeTotalPages',
+                                bc.data.totalPage, mypage)
                         }
                     }
                 }
@@ -205,7 +208,10 @@
                 }
             })
         })
+        $('.pull-right').click(function () {
+            parent.$(".level02>li:eq(1)").click();
 
+          })
     })
 </script>
 
