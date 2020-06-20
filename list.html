@@ -130,18 +130,6 @@
             </div>
 
 
-            <div id="pagination" class="page"></div>
-            <script>
-                $(function () {
-                    $("#pagination").pagination({
-                        currentPage: 2,
-                        totalPage: 8,
-                        callback: function (current) {
-                            alert('ok!');
-                        }
-                    });
-                });
-            </script>
 
         </div>
         <div class="right_con setfl">
@@ -243,6 +231,7 @@
             </div>
         </div>
         {{/each}}
+        <div id="pagination" class="page"></div>
     </script>
     <!-- 最新评论 模板引擎 -->
     <script type="text/html" id="hotSay">
@@ -290,7 +279,14 @@
                         // 最新资讯
                         var cs = $('.setfr').html('<div class="list_title"><h3>' +
                             bc.data.data[0].category + '</h3></div>' + template('newNews', bc));
-
+                        // 分页插件
+                        $("#pagination").pagination({
+                            currentPage: 2,
+                            totalPage: 8,
+                            callback: function (current) {
+                                alert('ok!');
+                            }
+                        });
                     }
                 })
             }
@@ -340,22 +336,25 @@
                     }
                 }
             })
-        })
-        //最新评论
-        $.ajax({
-            url: 'http://localhost:8080/api/v1/index/latest_comment',
-            success: function (bc) {
-                $('.comment_list').html(template('hotSay', bc));
-            }
-        })
-        //焦点关注
-        $.ajax({
-            url: 'http://localhost:8080/api/v1/index/attention',
-            success: function (bc) {
-                $('.guanzhu_list').html(template('zeroSee', bc));
+
+            //最新评论
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/latest_comment',
+                success: function (bc) {
+                    $('.comment_list').html(template('hotSay', bc));
+                }
+            })
+            //焦点关注
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/attention',
+                success: function (bc) {
+                    $('.guanzhu_list').html(template('zeroSee', bc));
 
 
-            }
+                }
+
+            })
+
         })
     </script>
 </body>
