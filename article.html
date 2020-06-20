@@ -143,7 +143,7 @@
             </div>
             <div class="common_wrap">
                 <h3><i class="fa fa-commenting-o"></i> 最新评论</h3>
-                <ul class="content_list comment_list">
+                <ul class="content_list comment_list say_list">
                     <li>
                         <span>山</span>
                         <b><em>山治</em> 9个月前(08-14)说:</b>
@@ -209,6 +209,105 @@
     <script src="./js/template-web.js"></script>
     <script src="./js/jquery-1.12.4.min.js"></script>
 
+    <!-- 评论展示 模板引擎 -->
+    <script type="text/html" id="hotSay">
+        {{each data v}}
+        <div class="comment_detail_list">
+            <div class="person_pic fl">{{v.author.substring(0,1)}}</div>
+            <div class="name_time fl"><b>{{v.author}}</b><span>{{v.date}}&nbsp;{{v.time}}</span></div>
+            <div class="comment_text fl">
+                {{v.content}}
+            </div>
+        </div>
+        {{/each}}
+    </script>
+
+    <script>
+        $(function () {
+            var articleid = window.location.search.split('=')[1];
+            // 
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/article',
+                data: {
+                    id: articleid
+                },
+                success: function (bc) {
+                    $('.article_title').text(bc.data.title)
+                    // var imgL = '<img href='+bc.data.cover+
+                    '></img>';
+                    $('.article_con').html(bc.data.content);
+                    // console.log(bc);
+
+                    $('.article_info').html(bc.data.author + '&nbsp发布于&nbsp' + bc.data.date +
+                        '&nbsp分类:&nbsp' + bc.data.category + '&nbsp阅读:&nbsp' +
+                        bc.data.read + '&nbsp评论:&nbsp' + bc.data.comments)
+                    if (bc.data.next == null && bc.data.prev == null) {
+                        $('.article_links').html('<p>没有上下页了</p>')
+                    } else if (bc.data.next == null) {
+                        $('.article_links').html('上一篇： <a href="./article.html?id=' + bc.data.prev
+                            .id +
+                            '">' + bc.data.prev
+                            .title + '</a><br> 下一篇： <a href="#' + '"">没有下一篇 </a>')
+                    } else if (bc.data.prev == null) {
+                        $('.article_links').html(
+                            '上一篇： <a href="#">没有上一篇</a><br> 下一篇： <a href="./article.html?id=' +
+                            bc
+                            .data
+                            .next
+                            .id + '"">' + bc.data.next.title + '</a>')
+                    } else if (bc.data.next != null) {
+                        $('.article_links').html('上一篇： <a href="./article.html?id=' + bc.data.prev
+                            .id +
+                            '">' + bc.data.prev
+                            .title + '</a><br> 下一篇： <a href="./article.html?id=' + bc
+                            .data
+                            .next
+                            .id + '"">' + bc.data.next.title + '</a>')
+                    }
+                }
+            })
+            // 评论发表
+
+            // 请求发表
+            $('.comment_sub').on('click', function (e) {
+                e.preventDefault();
+                var userName = $('.comment_name').val().trim();
+                var userSay = $('.comment_input').val().trim();
+                if (userName == '' || userSay == '') {
+                    alert('用户名或者评论不能为空')
+                } else {
+                    $.ajax({
+                        url: 'http://localhost:8080/api/v1/index/post_comment',
+                        type: 'post',
+                        data: {
+                            author: userName,
+                            content: userSay,
+                            articleId: articleid
+                        },
+                        success: function (bc) {
+                            if (bc.code == 201) {
+                                alert('发表成功，待审核')
+                                var userName = $('.comment_name').val('');
+                                var userSay = $('.comment_input').val('');
+                            }
+                        }
+                    })
+                }
+            })
+            //评论显示
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/get_comment',
+                data: {
+                    articleId: articleid
+                },
+                success: function (bc) {
+                    console.log(bc);
+                    $('.comment_list_con').html(template('hotSay', bc))
+                }
+
+            })
+        })
+    </script>
 </body>
 
 </html>
