@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="css/main.css">
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <script src="./libs/template-web.js"></script>
+  <script src="./libs/jquery.twbsPagination.js"></script>
+
 </head>
 
 <body>
@@ -142,24 +144,149 @@
         </tbody>
       </table>
       <div class="row text-center">
-        <ul class="pagination pagination-sm">
-          <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-          <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item"><a href="#" class="page-link">4</a></li>
-          <li class="page-item"><a href="#" class="page-link">5</a></li>
-          <li class="page-item"><a href="#" class="page-link">6</a></li>
-          <li class="page-item"><a href="#" class="page-link">7</a></li>
-          <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-          <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
+        <ul id="pagination" class="pagination-sm">
         </ul>
-        <ul id="pagination" class="pagination-sm"></ul>
       </div>
-
     </div>
   </div>
+  <script id="commentList" type="text/html">
+    {{each data.data v}}
+    {{if v.state == '待审核'}}
+    <tr class="danger">
+      {{else}}
+    <tr>
+      {{/if}}
+      <td>{{v.author}}</td>
+      <td>{{v.content}}</td>
+      <td>《{{v.title}}》</td>
+      <td>{{v.date}}&nbsp;{{v.time}}</td>
+      <td>{{v.state}}</td>
+      <td class="text-center" id="{{v.id}}">
+        {{if v.state == '待审核'}}
+        <a href="javascript:void(0);;" class="btn btn-info btn-xs">批准</a>
+        <a href="javascript:void(0);;" class="btn btn-danger btn-xs">删除</a>
+        {{else if v.state == '已批准' ||  v.state == '已通过'}}
+        <a href="javascript:void(0);;" class="btn btn-warning btn-xs">拒绝</a>
+        <a href="javascript:void(0);;" class="btn btn-danger btn-xs">删除</a>
+        {{else}}
+        <a href="javascript:void(0);;" class="btn btn-danger btn-xs">删除</a>
+        {{/if}}
+      </td>
+    </tr>
+    {{/each}}
+  </script>
+  <script>
+    $(function () {
+      var mypage = 1; // 所有页码
+      var currentPage = 1; // 当前页码
+      // 展示所有评论
+      $.ajax({
+        url: 'http://localhost:8080/api/v1/admin/comment/search',
+        success: function (bc) {
+          $('tbody').html(template('commentList', bc))
+          // console.log(bc);
+          // 分页插件显示
+          $('#pagination').twbsPagination({
+            totalPages: bc.data.totalPage,
+            visiblePages: 7,
+            //点击分页页码 渲染页面
+            onPageClick: function (event, page) {
+              currentPage = page
+              $.ajax({
+                url: 'http://localhost:8080/api/v1/admin/comment/search',
+                data: {
+                  page: page
+                },
+                success: function (bc) {
+                  $('tbody').html(template('commentList', bc))
+                }
+              })
+            }
+          });
+        }
+      })
+
+      //点击批准触发事件
+      $('tbody').on('click', '.btn-info', function (e) {
+        var thisId = $(this).parent().attr('id')
+        console.log(thisId)
+        $.ajax({
+          url: 'http://localhost:8080/api/v1/admin/comment/pass',
+          type: 'post',
+          data: {
+            id: thisId
+          },
+          success: function (bc) {
+            if (bc.code == 200) {
+              alert('批准成功');
+              $.ajax({
+                url: 'http://localhost:8080/api/v1/admin/comment/search',
+                success: function (bc) {
+                  $('tbody').html(template('commentList', bc))
+                }
+              })
+            }
+          }
+        })
+      })
+      //点击触发删除事件
+      $('tbody').on('click', '.btn-danger', function (e) {
+        var thisId = $(this).parent().attr('id')
+        $.ajax({
+          url: 'http://localhost:8080/api/v1/admin/comment/delete',
+          type: 'post',
+          data: {
+            id: thisId
+          },
+          success: function (bc) {
+            //获取当前页码数据
+            $.ajax({
+              url: 'http://localhost:8080/api/v1/admin/comment/search',
+              success: function (bc) {
+                if (bc.data.totalPage == currentPage - 1) {
+                  currentPage -= 1;
+                }
+                mypage = bc.data.totalPage;
+                // console.log(mypage); 
+                $('#pagination').twbsPagination('changeTotalPages',
+                  mypage, currentPage)
+              }
+            })
+            if (bc.code == 200) {
+              alert('删除成功');
+              // console.log(bc)
+
+              // window.location.reload()
+            }
+          }
+        })
+      })
+
+      //点击拒绝 触发事件
+      $('tbody').on('click', '.btn-warning', function (e) {
+        var thisId = $(this).parent().attr('id')
+        $.ajax({
+          url: 'http://localhost:8080/api/v1/admin/comment/reject',
+          type: 'post',
+          data: {
+            id: thisId
+          },
+          success: function (bc) {
+            if (bc.code == 200) {
+              alert('拒绝成功');
+              $.ajax({
+                url: 'http://localhost:8080/api/v1/admin/comment/search',
+                success: function (bc) {
+                  $('tbody').html(template('commentList', bc))
+                }
+              })
+            }
+          }
+        })
+      })
+
+    })
+  </script>
 </body>
 
 </html>

@@ -133,7 +133,7 @@
                     success: function (bc) {
                         if (bc.code == 200) {
                             alert('发布稿件，操作成功')
-                            window.history.back();
+                            parent.$('.level02 li:eq(0) a')[0].click();
                         }
                     }
                 })
@@ -153,7 +153,8 @@
 
                         if (bc.code == 200) {
                             alert('存为草稿，操作成功')
-                            window.history.back();
+                            parent.$('.level02 li:eq(0) a')[0].click();
+
                         }
                     }
                 })
